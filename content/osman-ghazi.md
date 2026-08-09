@@ -4,7 +4,7 @@ figure: Osman Ghazi
 era: The Rise of the Ottomans
 year: 1299
 published: true
-image: portraits/osman-ghazi.png
+image: portraits/osman-ghazi.jpg
 summary: >-
   A frontier chief with a few hundred horsemen and no city worth the name. His
   descendants would rule from Budapest to Baghdad for six hundred years.

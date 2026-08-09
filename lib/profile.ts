@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 export type ProfilePageData = {
   displayName: string;
@@ -10,45 +11,38 @@ export type ProfilePageData = {
 };
 
 export async function getProfilePageData(): Promise<ProfilePageData | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    if (userError && userError.name !== "AuthSessionMissingError") {
-      throw new Error(`Could not load account: ${userError.message}`);
-    }
-    return null;
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("display_name, handle, avatar_path")
-    .eq("id", user.id)
-    .maybeSingle();
+  // Three independent questions, asked together rather than in a queue.
+  // RLS limits the chapter list to published stories, so old draft progress
+  // cannot inflate the totals.
+  const [
+    { data: profile, error: profileError },
+    { data: progress, error: progressError },
+    { data: chapters, error: chapterError },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("display_name, handle, avatar_path")
+      .eq("id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("chapter_progress")
+      .select("chapter_id, completed_at")
+      .eq("user_id", user.id)
+      .not("completed_at", "is", null),
+    supabase.from("chapters").select("id, story_id"),
+  ]);
 
   if (profileError) {
     throw new Error(`Could not load profile: ${profileError.message}`);
   }
-
-  const { data: progress, error: progressError } = await supabase
-    .from("chapter_progress")
-    .select("chapter_id, completed_at")
-    .eq("user_id", user.id)
-    .not("completed_at", "is", null);
-
   if (progressError) {
     throw new Error(`Could not load progress: ${progressError.message}`);
   }
-
-  // RLS limits this to chapters belonging to published stories. Keeping the
-  // totals on that same set prevents old draft progress from inflating stats.
-  const { data: chapters, error: chapterError } = await supabase
-    .from("chapters")
-    .select("id, story_id");
-
   if (chapterError) {
     throw new Error(`Could not count chapters: ${chapterError.message}`);
   }

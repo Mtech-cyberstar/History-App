@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 // The design's header, minus the streak, hearts and search buttons — those
 // were cut, see docs/SPEC.md. In their place: who is signed in.
@@ -7,13 +8,11 @@ import { createClient } from "@/lib/supabase/server";
 // This runs on the server, so it can ask Supabase who the visitor is before
 // the page is ever sent to the browser. No flicker, no "loading…" state.
 export default async function SiteHeader() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   let name: string | null = null;
   if (user) {
+    const supabase = await createClient();
     const { data: profile } = await supabase
       .from("profiles")
       .select("display_name")

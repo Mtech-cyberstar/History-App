@@ -1,16 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { saveChapterProgress } from "@/lib/progress-client";
 
 export default function CompleteChapter({
   chapterId,
   signedIn,
+  nextHref,
+  nextLabel,
 }: {
   chapterId: string;
   signedIn: boolean;
+  nextHref: string;
+  nextLabel: string;
 }) {
+  const pathname = usePathname();
   const [complete, setComplete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +52,19 @@ export default function CompleteChapter({
                 : error ?? "Your progress is saved."
               : "Sign in to save your progress."}
           </p>
-          {!signedIn && <Link href="/sign-in">Sign in</Link>}
+          <div className="quiz-result-actions">
+            <Link className="quiz-continue" href={nextHref}>
+              {nextLabel}
+            </Link>
+            {!signedIn && (
+              <Link
+                className="quiz-retry"
+                href={`/sign-in?next=${encodeURIComponent(pathname)}`}
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
         </>
       ) : (
         <button type="button" onClick={() => void finish()}>

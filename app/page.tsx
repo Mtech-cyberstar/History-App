@@ -1,44 +1,26 @@
 import BenefitsSection from "@/components/BenefitsSection";
 import BottomNavigation from "@/components/BottomNavigation";
+import ContinueReading from "@/components/ContinueReading";
 import EarlyAccessPanel from "@/components/EarlyAccessPanel";
 import HeroBanner from "@/components/HeroBanner";
 import PathsPreview from "@/components/PathsPreview";
 import ProPanel from "@/components/ProPanel";
 import SiteHeader from "@/components/SiteHeader";
-import StoryCollection from "@/components/StoryCollection";
-import { getStoriesByEra } from "@/lib/stories";
+import StoryBrowse from "@/components/StoryBrowse";
 
-export default async function BrowsePage() {
-  const eras = await getStoriesByEra();
-
+// Nothing is awaited here on purpose. Each panel below fetches its own data,
+// and because they are siblings React renders them at the same time instead of
+// one after another. Awaiting anything in this function would put every panel
+// behind it in a queue.
+export default function BrowsePage() {
   return (
     <main className="page-bg">
       <div className="app-shell">
         <SiteHeader />
         <HeroBanner />
+        <ContinueReading />
         <PathsPreview />
-
-        <div id="stories" className="story-browse">
-          {eras.length === 0 ? (
-            <section className="collection">
-              <div className="collection-copy">
-                <h2>No stories yet</h2>
-                <p>
-                  Write one in the content folder, then run{" "}
-                  <code>npm run import</code>.
-                </p>
-              </div>
-            </section>
-          ) : (
-            eras.map((group) => (
-              <StoryCollection
-                key={group.era}
-                title={group.era}
-                stories={group.stories}
-              />
-            ))
-          )}
-        </div>
+        <StoryBrowse />
 
         <EarlyAccessPanel />
         <BenefitsSection
