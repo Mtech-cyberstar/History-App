@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 export type ContinueReading = {
   storySlug: string;
@@ -27,11 +28,10 @@ type ProgressRow = {
 // nothing or finished everything — in all three cases the panel is hidden
 // rather than shown empty.
 export async function getContinueReading(): Promise<ContinueReading | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("chapter_progress")
@@ -58,18 +58,23 @@ export async function getContinueReading(): Promise<ContinueReading | null> {
     byStory.set(id, entry);
   }
 
+  if (byStory.size === 0) return null;
+
+  // One query for every candidate story's chapters, not one query per story.
+  // A loop containing a database call is how a page that was fine with three
+  // stories becomes slow with thirty.
+  const { data: chapters, error: chapterError } = await supabase
+    .from("chapters")
+    .select("story_id, position, title")
+    .in("story_id", [...byStory.keys()])
+    .order("position");
+
+  if (chapterError) {
+    throw new Error(`Could not load chapters: ${chapterError.message}`);
+  }
+
   for (const [storyId, entry] of byStory) {
-    const { data: chapters, error: chapterError } = await supabase
-      .from("chapters")
-      .select("position, title")
-      .eq("story_id", storyId)
-      .order("position");
-
-    if (chapterError) {
-      throw new Error(`Could not load chapters: ${chapterError.message}`);
-    }
-
-    const all = chapters ?? [];
+    const all = (chapters ?? []).filter((row) => row.story_id === storyId);
     const next = all.find((chapter) => !entry.positions.has(chapter.position));
     if (!next) continue; // finished this one, look at the story before it
 

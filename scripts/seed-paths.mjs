@@ -32,7 +32,31 @@ const paths = [
     published: true,
     stories: ["yunus-emre"],
   },
+  {
+    slug: "before-the-empire",
+    pill: "THE 1200s",
+    title: "Before the\nEmpire",
+    theme: "feudal",
+    position: 3,
+    published: true,
+    // Both alive in the same century, on the same collapsing frontier.
+    stories: ["yunus-emre", "osman-ghazi"],
+  },
+  {
+    slug: "fall-of-constantinople",
+    pill: "1453",
+    title: "The Fall of\nConstantinople",
+    theme: "tudors",
+    position: 4,
+    published: true,
+    stories: ["mehmed-the-conqueror"],
+  },
 ];
+
+// A story can sit in more than one path on purpose. These are different routes
+// through the same small library, not a filing system where each story has one
+// home. Only `theme` values allowed by the paths_theme_check constraint work
+// here — currently 'feudal' and 'tudors'.
 
 for (const { stories, ...path } of paths) {
   const { data: row, error } = await supabase

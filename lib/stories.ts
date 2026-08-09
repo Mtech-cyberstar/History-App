@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 // What a story card needs to know about itself. Deliberately smaller than the
 // full database row — the browse page has no use for the chapter text.
@@ -117,13 +118,18 @@ export async function getStoryBySlug(
 ): Promise<StoryDetail | null> {
   const supabase = await createClient();
 
-  const { data: story, error } = await supabase
-    .from("stories")
-    .select(
-      "slug, title, figure, era, year, summary, image_path, chapters(id, position, title)",
-    )
-    .eq("slug", slug)
-    .maybeSingle();
+  // Asked at the same time rather than one after the other: the story does not
+  // depend on who is asking, and each round trip to Supabase costs real time.
+  const [{ data: story, error }, user] = await Promise.all([
+    supabase
+      .from("stories")
+      .select(
+        "slug, title, figure, era, year, summary, image_path, chapters(id, position, title)",
+      )
+      .eq("slug", slug)
+      .maybeSingle(),
+    getCurrentUser(),
+  ]);
 
   if (error) throw new Error(`Could not load story: ${error.message}`);
   if (!story) return null;
@@ -131,9 +137,6 @@ export async function getStoryBySlug(
   const chapters = [...(story.chapters ?? [])].sort(
     (a, b) => a.position - b.position,
   );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const completedChapterIds = new Set<string>();
 
@@ -191,17 +194,34 @@ export async function getChapterByPosition(
   }
   if (!story) return null;
 
-  const { data: chapter, error: chapterError } = await supabase
-    .from("chapters")
-    .select(
-      "id, position, title, body, audio_path, quiz_questions(id, position, question, options, answer_index)",
-    )
-    .eq("story_id", story.id)
-    .eq("position", position)
-    .maybeSingle();
+  // The chapter itself, its neighbours, and who is asking are three
+  // independent questions, so they go out together instead of in a queue.
+  const [
+    { data: chapter, error: chapterError },
+    { data: siblings, error: siblingError },
+    user,
+  ] = await Promise.all([
+    supabase
+      .from("chapters")
+      .select(
+        "id, position, title, body, audio_path, quiz_questions(id, position, question, options, answer_index)",
+      )
+      .eq("story_id", story.id)
+      .eq("position", position)
+      .maybeSingle(),
+    supabase
+      .from("chapters")
+      .select("position, title")
+      .eq("story_id", story.id)
+      .order("position"),
+    getCurrentUser(),
+  ]);
 
   if (chapterError) {
     throw new Error(`Could not load chapter: ${chapterError.message}`);
+  }
+  if (siblingError) {
+    throw new Error(`Could not load chapter list: ${siblingError.message}`);
   }
   if (!chapter) return null;
 
@@ -228,21 +248,6 @@ export async function getChapterByPosition(
       options: row.options,
       answerIndex: row.answer_index,
     });
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // The neighbours, so the chapter can offer somewhere to go when it ends.
-  const { data: siblings, error: siblingError } = await supabase
-    .from("chapters")
-    .select("position, title")
-    .eq("story_id", story.id)
-    .order("position");
-
-  if (siblingError) {
-    throw new Error(`Could not load chapter list: ${siblingError.message}`);
   }
 
   const ordered = siblings ?? [];

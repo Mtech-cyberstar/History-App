@@ -462,9 +462,19 @@ a.hero-card,a.continue-card,a.pro-power { display:block; }
 /* --- Path cards and the path page ----------------------------------------
    The feudal card's artwork was a photo tied to a path we no longer have, so
    it is drawn instead. Nothing here waits on S3. */
-.path-art-feudal { position:absolute; inset:0 0 auto; height:44.5cqw; display:grid; place-items:center; background:linear-gradient(#b9a6ff,#7a63c8); }
-.path-art-feudal svg { width:30cqw; fill:none; stroke:#4a377b; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 2cqw 1.5cqw #3a2a6b55); }
+.path-art-drawn { position:absolute; inset:0 0 auto; height:44.5cqw; display:grid; place-items:center; }
+.path-art-drawn.feudal { background:linear-gradient(#b9a6ff,#7a63c8); }
+.path-art-drawn.tudors { background:linear-gradient(#efac18,#bd720b); }
+.path-art-drawn svg { width:30cqw; fill:none; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+.path-art-drawn.feudal svg { stroke:#4a377b; filter:drop-shadow(0 2cqw 1.5cqw #3a2a6b55); }
+.path-art-drawn.tudors svg { stroke:#7c4708; filter:drop-shadow(0 2cqw 1.5cqw #673c0a55); }
 .path-card:focus-visible { outline:4px solid #68d9ff; outline-offset:3px; }
+
+/* The design only ever drew the dotted route and its chess pieces on the
+   purple card, so their colours are hardcoded purple. With more than one card
+   per colour they bled purple onto the gold ones. */
+.tudors .path-map>svg { stroke:#c98a12; }
+.tudors .rook { fill:#8a5a06; stroke:#f0b44b; }
 
 .path-screen { padding-bottom:4cqw; }
 .path-hero { display:flex; flex-direction:column; align-items:flex-start; gap:2.4cqw; margin:0 6.75cqw 8cqw; padding:7cqw 6cqw; border-radius:5cqw; }
