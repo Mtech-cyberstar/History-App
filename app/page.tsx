@@ -1,5 +1,6 @@
 import BenefitsSection from "@/components/BenefitsSection";
 import BottomNavigation from "@/components/BottomNavigation";
+import ContinueReading from "@/components/ContinueReading";
 import EarlyAccessPanel from "@/components/EarlyAccessPanel";
 import HeroBanner from "@/components/HeroBanner";
 import PathsPreview from "@/components/PathsPreview";
@@ -16,6 +17,7 @@ export default async function BrowsePage() {
       <div className="app-shell">
         <SiteHeader />
         <HeroBanner />
+        <ContinueReading />
         <PathsPreview />
 
         <div id="stories" className="story-browse">

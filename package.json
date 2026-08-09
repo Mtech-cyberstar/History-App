@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "import": "node --env-file=.env.local scripts/import.mjs"
+    "import": "node --env-file=.env.local scripts/import.mjs",
+    "seed:paths": "node --env-file=.env.local scripts/seed-paths.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1105.0",

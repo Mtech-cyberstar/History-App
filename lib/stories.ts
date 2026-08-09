@@ -93,6 +93,22 @@ export async function getStoriesByEra(): Promise<EraGroup[]> {
   return groups;
 }
 
+// The most recently added story. Used by the Early Access panel on the home
+// page, which in the design showed a made-up story and did nothing when
+// tapped. Showing the newest real one keeps the panel honest and useful.
+export async function getNewestStory(): Promise<StoryCard | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("stories")
+    .select("slug, title, figure, era, year, summary, image_path")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(`Could not load the newest story: ${error.message}`);
+  return data;
+}
+
 // One published story and the small amount of chapter data its overview page
 // needs. The chapter body and quiz stay out of this query until the reader
 // opens a chapter.
