@@ -136,12 +136,22 @@ Downloads all the pre-written code your site depends on. Takes a few minutes
 the first time and prints a wall of text you can ignore completely. You only
 ever run this once.
 
-```
-npm run db:push
-```
+### Create the tables
 
-Creates all the tables in your Supabase project. Run it once now, and again
-whenever the AI tells you the database changed.
+There is no command for this one — you paste it in by hand, which sounds worse
+than it is and takes about a minute.
+
+1. In VS Code, open the newest file in `supabase/migrations/`
+2. Click inside it, press **Ctrl+A** then **Ctrl+C**
+3. In Supabase: **SQL Editor** → **New query** → click in the big box →
+   **Ctrl+V** → **Run**
+
+You want **"Success. No rows returned"** in green. That is correct — it built
+things rather than looking things up.
+
+Do this once for each file in `supabase/migrations/`, oldest first, and again
+whenever the AI adds a new one. If you get red text, paste the whole thing to
+your assistant.
 
 ```
 npm run import

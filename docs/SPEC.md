@@ -137,9 +137,10 @@ None of these should break the site or show an empty box:
 
 ## Build in this order
 
-One step at a time. After each, stop and say what to check.
+Steps 1–12 are done and the site is live. Kept as a record of the order, and
+because it is still the order to follow if any of it is rebuilt.
 
-1. **Skeleton.** ✅ Done. Project set up, `globals.css` from the design, root
+1. **Skeleton.** ✅ Project set up, `globals.css` from the design, root
    layout, interface artwork in `public/assets/ui/`.
 2. **Database.** Supabase project. Every table, trigger and RLS policy from
    `DATA-MODEL.md`, checked in as a migration file under
@@ -158,12 +159,29 @@ One step at a time. After each, stop and say what to check.
 8. **Quiz**, and saving progress for signed-in users.
 9. **Profile** at `/profile`, with stats counted from `chapter_progress`.
 10. **Decorative sections** — hero, Paths, Early Access, benefits, Battle stub.
-11. **Upload route** — presigned S3 PUT, admin only.
-12. **Deploy** to Vercel.
+11. **Upload route** — presigned S3 PUT, admin only. Written but never
+    exercised: no AWS credentials exist yet.
+12. **Deploy** to Vercel. Live at `history-app-tan.vercel.app`.
 
 Steps 2 and 3 come first on purpose: the tables and the sign-in exist before
 anything is wired to them, so the frontend is built against a real database
 from its first line rather than against mock data that has to be torn out.
+
+---
+
+## Still open
+
+- **S3 is not set up.** `NEXT_PUBLIC_ASSET_BASE_URL` is empty, so portraits
+  fall back to the initial-letter placeholder and no chapter has audio. The
+  upload route in step 11 has never run. `public/dev-assets/` is a temporary
+  local-only stand-in — see the note in `lib/assets.ts` and delete it when S3
+  arrives.
+- **Seed portraits are ~2.5 MB each** for a card rendered about 130px wide.
+  Resize before uploading.
+- **`js-yaml`** is a dev dependency used only by the import script, added
+  without the sign-off `CLAUDE.md` asks for.
+- **Migrations are applied by hand** through the Supabase SQL editor. There is
+  no `db:push`. Fine at this size; revisit if migrations become frequent.
 
 ---
 

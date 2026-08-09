@@ -399,3 +399,15 @@ button:focus-visible { outline:4px solid #68d9ff; outline-offset:3px; }
 .battle-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3cqw; text-align:center; }
 .battle-empty h1 { max-width:78cqw; font-size:6cqw; }
 .battle-empty p { margin:0; color:#d2dedc; font-size:3.8cqw; }
+
+/* --- Error and not-found screens -----------------------------------------
+   Used by app/error.tsx and app/not-found.tsx. The design has neither, so
+   these borrow its spacing and colours to look like they belong. */
+.state-screen { padding:14cqw 6.75cqw; background:var(--slate); }
+.state-screen h2 { margin:0 0 3cqw; font-size:5.8cqw; line-height:1.08; font-weight:700; letter-spacing:-.1cqw; }
+.state-screen p { margin:0 0 3cqw; max-width:84cqw; color:#cfd6dd; font-size:3.9cqw; line-height:1.4; }
+.state-detail { color:var(--muted); font-size:3.3cqw; }
+.state-detail code { font-size:3.2cqw; word-break:break-all; }
+.state-actions { display:flex; flex-wrap:wrap; align-items:center; gap:4cqw; margin-top:6cqw; }
+.state-button { height:13cqw; padding:0 6cqw; border:0; border-radius:3.7cqw; background:#fff; color:#162b42; font-size:4cqw; font-weight:700; cursor:pointer; }
+.state-link { color:#68d9ff; font-size:3.8cqw; font-weight:600; text-decoration:underline; }
