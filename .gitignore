@@ -11,10 +11,6 @@ out/
 # The design project this site was built from. Reference only, not part of the site.
 Paladin_Home_Master_Source/
 
-# Local stand-in portraits, so the site can be looked at before S3 exists.
-# Content belongs on S3, never in the repo. See lib/assets.ts.
-public/dev-assets/
-
 # Operating system clutter.
 .DS_Store
 Thumbs.db

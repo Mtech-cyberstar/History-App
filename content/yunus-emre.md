@@ -4,7 +4,7 @@ figure: Yunus Emre
 era: Medieval Anatolia
 year: 1240
 published: true
-image: portraits/yunus-emre.png
+image: portraits/yunus-emre.jpg
 summary: >-
   Scholars wrote in Persian and Arabic. He wrote in plain Turkish, for farmers
   and weavers, and seven hundred years later they still know the lines by heart.

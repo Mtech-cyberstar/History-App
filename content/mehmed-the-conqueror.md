@@ -4,7 +4,7 @@ figure: Sultan Mehmed II
 era: The Rise of the Ottomans
 year: 1453
 published: true
-image: portraits/mehmed-the-conqueror.png
+image: portraits/mehmed-the-conqueror.jpg
 summary: >-
   Constantinople's walls had held for over a thousand years. A twenty-one-year-old
   arrived with a cannon that threw stones weighing half a tonne.

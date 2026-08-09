@@ -1,37 +1,28 @@
-// Portraits and audio live on S3, and the database only stores the short path
-// to them, like 'portraits/osman-ghazi.png'. This sticks that onto the front
-// half of the address, which lives in one environment variable.
+// Portraits and audio are stored as short paths like 'portraits/osman-ghazi.jpg'.
+// This turns one into an address the browser can fetch.
 //
-// The point of doing it here and nowhere else: if those files ever move to a
-// different host, one line in .env.local changes and every story keeps working.
+// There are two modes, and which one is used depends on a single setting:
 //
-// Returns null when there is nothing to show. Callers must handle null,
-// because a story written before its picture arrives is normal.
-
-// TEMPORARY, and only on your own computer.
+//   NEXT_PUBLIC_ASSET_BASE_URL set    -> S3. The intended arrangement: media
+//                                        lives outside the code, so adding a
+//                                        story does not mean redeploying.
+//   NEXT_PUBLIC_ASSET_BASE_URL empty  -> files shipped in public/assets/,
+//                                        served by the site itself.
 //
-// Until the S3 address arrives there is nowhere real to fetch portraits from,
-// so local copies in public/dev-assets/ stand in, purely so the site can be
-// looked at. This is against the rule in CLAUDE.md that public/ holds design
-// and S3 holds content, and it is deliberately narrow:
+// The second mode is a stopgap while S3 is not set up, and it is why the three
+// seed portraits sit in public/assets/portraits/. It goes against the rule in
+// CLAUDE.md that public/ is for design and S3 is for content, and the reason
+// that rule exists shows up here: every new story now needs a redeploy to show
+// its picture. Fine for three. Not fine for thirty.
 //
-//   - it never applies once NEXT_PUBLIC_ASSET_BASE_URL is set
-//   - it never applies in a production build
-//   - public/dev-assets/ is not committed, so it never reaches the live site
-//
-// Delete this constant and the two lines that use it once S3 is set up.
-const LOCAL_PREVIEW_BASE = "/dev-assets/";
+// To switch to S3: set the variable, upload the files, delete public/assets/
+// portraits/. Nothing else changes.
+const LOCAL_BASE = "/assets/";
 
 export function assetUrl(path: string | null | undefined): string | null {
   if (!path) return null;
 
-  let base = process.env.NEXT_PUBLIC_ASSET_BASE_URL;
-
-  if (!base && process.env.NODE_ENV !== "production") {
-    base = LOCAL_PREVIEW_BASE;
-  }
-
-  if (!base) return null;
+  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || LOCAL_BASE;
 
   return base.endsWith("/") ? `${base}${path}` : `${base}/${path}`;
 }
