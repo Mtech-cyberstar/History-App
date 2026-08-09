@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import SiteHeader from "@/components/SiteHeader";
 import StoryChapterList from "@/components/StoryChapterList";
 import { assetUrl } from "@/lib/assets";
@@ -34,6 +35,15 @@ export default async function StoryPage({
 
   const portrait = assetUrl(story.image_path);
 
+  // The one obvious thing to press. Resumes at the first unfinished chapter,
+  // so a returning reader does not have to remember where they got to.
+  const firstUnread =
+    story.chapters.find((chapter) => !chapter.completed) ?? story.chapters[0];
+  const allDone =
+    story.chapters.length > 0 &&
+    story.chapters.every((chapter) => chapter.completed);
+  const startedAny = story.chapters.some((chapter) => chapter.completed);
+
   return (
     <main className="page-bg">
       <div className="app-shell">
@@ -61,12 +71,28 @@ export default async function StoryPage({
             {story.summary && <p>{story.summary}</p>}
           </header>
 
+          {firstUnread && (
+            <Link
+              className="story-start"
+              href={`/stories/${story.slug}/${firstUnread.position}`}
+            >
+              {allDone
+                ? "Read it again"
+                : startedAny
+                  ? `Continue — Chapter ${firstUnread.position}`
+                  : "Start reading"}
+            </Link>
+          )}
+
           <StoryChapterList
             slug={story.slug}
             chapters={story.chapters}
             signedIn={story.signedIn}
           />
         </article>
+
+        <div className="scroll-spacer" />
+        <BottomNavigation />
       </div>
     </main>
   );

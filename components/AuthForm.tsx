@@ -9,7 +9,15 @@ import { createClient } from "@/lib/supabase/client";
 // `mode` decides which Supabase call runs when you press the button.
 type Mode = "sign-in" | "sign-up";
 
-export default function AuthForm({ mode }: { mode: Mode }) {
+export default function AuthForm({
+  mode,
+  next = "/",
+}: {
+  mode: Mode;
+  // Where to land after signing in. Someone who was halfway through a chapter
+  // should come back to that chapter, not be dumped on the home page.
+  next?: string;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +39,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         },
       });
 
@@ -58,7 +66,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   function finish() {
     // refresh() re-runs the pages on the server so the header notices the new
     // login. Without it you would stay looking signed out until a hard reload.
-    router.push("/");
+    router.push(next);
     router.refresh();
   }
 
@@ -115,11 +123,17 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       <p className="auth-swap">
         {signingUp ? (
           <>
-            Already have an account? <Link href="/sign-in">Sign in</Link>
+            Already have an account?{" "}
+            <Link href={`/sign-in?next=${encodeURIComponent(next)}`}>
+              Sign in
+            </Link>
           </>
         ) : (
           <>
-            New here? <Link href="/sign-up">Create an account</Link>
+            New here?{" "}
+            <Link href={`/sign-up?next=${encodeURIComponent(next)}`}>
+              Create an account
+            </Link>
           </>
         )}
       </p>

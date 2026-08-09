@@ -5,7 +5,7 @@ export default function PathsPreview() {
         <h2>Paths <sup>NEW</sup></h2>
         <p>Experience stories in a new, interactive and<br />engaging format</p>
       </div>
-      <div className="paths-row">
+      <div className="paths-row paths-row-scroll">
         <article className="path-card feudal">
           <img
             className="path-art"

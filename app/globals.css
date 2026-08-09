@@ -411,3 +411,46 @@ button:focus-visible { outline:4px solid #68d9ff; outline-offset:3px; }
 .state-actions { display:flex; flex-wrap:wrap; align-items:center; gap:4cqw; margin-top:6cqw; }
 .state-button { height:13cqw; padding:0 6cqw; border:0; border-radius:3.7cqw; background:#fff; color:#162b42; font-size:4cqw; font-weight:700; cursor:pointer; }
 .state-link { color:#68d9ff; font-size:3.8cqw; font-weight:600; text-decoration:underline; }
+
+/* --- Somewhere to go next -------------------------------------------------
+   The reading loop used to dead-end: finish a chapter and the only control
+   was "Try again". These give every ending a way forward. */
+
+/* Options keep their answered look now that they use aria-disabled rather
+   than disabled, which would have dropped them out of the tab order. */
+.quiz-option[aria-disabled="true"] { cursor:default; }
+
+.quiz-result-actions { display:flex; flex-direction:column; gap:3cqw; }
+.quiz-continue { display:grid; place-items:center; min-height:12.5cqw; padding:2.6cqw 4.5cqw; border-radius:3.4cqw; background:#fff; font-size:4cqw; font-weight:700; }
+.quiz-result .quiz-continue,.chapter-complete .quiz-continue { color:#162b42; text-decoration:none; }
+.quiz-retry { display:grid; place-items:center; min-height:11cqw; }
+.quiz-result .quiz-retry,.chapter-complete .quiz-retry { border:.35cqw solid #64727e; border-radius:3cqw; background:transparent; color:#dfe5ea; font-weight:600; text-decoration:none; }
+
+/* The one obvious thing to press on a story. */
+.story-start { display:grid; place-items:center; min-height:13.5cqw; margin:1cqw 6.75cqw 8cqw; padding:2.8cqw 5cqw; border-radius:3.7cqw; background:#fff; color:#162b42; font-size:4.2cqw; font-weight:700; text-align:center; }
+.story-start:focus-visible { outline:.7cqw solid #68d9ff; outline-offset:.5cqw; }
+
+.chapter-pager { display:grid; grid-template-columns:1fr 1fr; gap:3.5cqw; margin-top:9cqw; }
+.chapter-pager-item { display:flex; flex-direction:column; justify-content:center; gap:1.4cqw; min-height:19cqw; padding:3.6cqw; border:.35cqw solid #56636f; border-radius:3.6cqw; background:#2c3741; }
+.chapter-pager-item small { color:#9fabb6; font-size:3.1cqw; font-weight:600; }
+.chapter-pager-item strong { font-size:3.7cqw; line-height:1.25; }
+.chapter-pager-item.next { text-align:right; }
+.chapter-pager-item:focus-visible { outline:.7cqw solid #68d9ff; outline-offset:.5cqw; }
+.chapter-position { margin:4.5cqw 0 0; color:#9fabb6; font-size:3.3cqw; text-align:center; }
+
+/* The design's Paths row was a fixed mock-up, so the second card was clipped
+   at the screen edge with no way to reach it. Same treatment as .card-row:
+   added alongside the design's rule, never replacing it. */
+.paths-row-scroll { overflow-x:auto; padding-right:6.75cqw; scrollbar-width:none; }
+.paths-row-scroll::-webkit-scrollbar { display:none; }
+
+/* --- Loading placeholders ------------------------------------------------- */
+.skeleton-screen { display:flex; flex-direction:column; gap:3.5cqw; padding:6cqw 6.75cqw 14cqw; }
+.skeleton-block { border-radius:3cqw; background:linear-gradient(90deg,#3c4a56 0%,#485764 50%,#3c4a56 100%); background-size:200% 100%; animation:skeleton-sweep 1.3s ease-in-out infinite; }
+.skeleton-portrait { height:70cqw; border-radius:5cqw; }
+.skeleton-line { height:5cqw; }
+.skeleton-line.short { width:38%; }
+.skeleton-line.wide { height:8cqw; width:82%; }
+.skeleton-card { height:20cqw; border-radius:3.6cqw; }
+@keyframes skeleton-sweep { from { background-position:200% 0; } to { background-position:-200% 0; } }
+@media (prefers-reduced-motion:reduce) { .skeleton-block { animation:none; } }

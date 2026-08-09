@@ -29,6 +29,11 @@ export type StoryDetail = StoryCard & {
   signedIn: boolean;
 };
 
+export type ChapterLink = {
+  position: number;
+  title: string;
+};
+
 export type ChapterDetail = {
   id: string;
   position: number;
@@ -37,6 +42,11 @@ export type ChapterDetail = {
   audio_path: string | null;
   questions: QuizQuestion[];
   signedIn: boolean;
+  // Where the reader can go next. Without these the chapter is a dead end:
+  // you finish the quiz and the only way on is the browser back button.
+  chapterCount: number;
+  previous: ChapterLink | null;
+  next: ChapterLink | null;
   story: {
     slug: string;
     title: string;
@@ -208,6 +218,20 @@ export async function getChapterByPosition(
     data: { user },
   } = await supabase.auth.getUser();
 
+  // The neighbours, so the chapter can offer somewhere to go when it ends.
+  const { data: siblings, error: siblingError } = await supabase
+    .from("chapters")
+    .select("position, title")
+    .eq("story_id", story.id)
+    .order("position");
+
+  if (siblingError) {
+    throw new Error(`Could not load chapter list: ${siblingError.message}`);
+  }
+
+  const ordered = siblings ?? [];
+  const here = ordered.findIndex((row) => row.position === chapter.position);
+
   return {
     id: chapter.id,
     position: chapter.position,
@@ -216,6 +240,9 @@ export async function getChapterByPosition(
     audio_path: chapter.audio_path,
     questions,
     signedIn: Boolean(user),
+    chapterCount: ordered.length,
+    previous: here > 0 ? ordered[here - 1] : null,
+    next: here >= 0 && here < ordered.length - 1 ? ordered[here + 1] : null,
     story: {
       slug: story.slug,
       title: story.title,

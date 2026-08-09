@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { saveChapterProgress } from "@/lib/progress-client";
 import type { QuizQuestion } from "@/lib/stories";
@@ -9,11 +10,18 @@ export default function Quiz({
   chapterId,
   questions,
   signedIn,
+  nextHref,
+  nextLabel,
 }: {
   chapterId: string;
   questions: QuizQuestion[];
   signedIn: boolean;
+  // Where to go when the quiz is over. The score screen used to offer only
+  // "Try again", which left the reader with nowhere to go but the back button.
+  nextHref: string;
+  nextLabel: string;
 }) {
+  const pathname = usePathname();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(() =>
     questions.map(() => null),
@@ -96,13 +104,26 @@ export default function Quiz({
           </p>
         ) : (
           <p>
-            Your score is not saved. <Link href="/sign-in">Sign in</Link> to
-            keep your progress.
+            Your score is not saved.{" "}
+            <Link href={`/sign-in?next=${encodeURIComponent(pathname)}`}>
+              Sign in
+            </Link>{" "}
+            to keep your progress.
           </p>
         )}
-        <button type="button" onClick={retry} disabled={saving}>
-          Try again
-        </button>
+        <div className="quiz-result-actions">
+          <Link className="quiz-continue" href={nextHref}>
+            {nextLabel}
+          </Link>
+          <button
+            className="quiz-retry"
+            type="button"
+            onClick={retry}
+            disabled={saving}
+          >
+            Try again
+          </button>
+        </div>
       </section>
     );
   }
@@ -130,9 +151,15 @@ export default function Quiz({
                 wrong ? " wrong" : ""
               }`}
               type="button"
-              key={option}
+              // Index, not the text. Two options could read the same, and React
+              // needs the keys in a list to be unique.
+              key={optionIndex}
               onClick={() => chooseAnswer(optionIndex)}
-              disabled={answered}
+              // aria-disabled rather than disabled: a disabled button drops out
+              // of the tab order, so a keyboard user reviewing their answer
+              // would find the options had vanished. chooseAnswer already
+              // ignores a second press.
+              aria-disabled={answered}
             >
               <span>{String.fromCharCode(65 + optionIndex)}</span>
               {option}
