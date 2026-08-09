@@ -1,0 +1,14 @@
+# Store every text file with Unix line endings in the repository, whatever the
+# computer editing it uses. Without this, Windows and Mac contributors show up
+# as having rewritten every line of every file they touch.
+* text=auto eol=lf
+
+# Binary files. Never translate these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.mp3 binary
+*.woff binary
+*.woff2 binary
